@@ -54,7 +54,7 @@ function Post(props) {
           avatar={
             <Link style={linkStyle}  to={{pathname : '/users/' + userId}}>
                 <Avatar sx={{ bgcolor: blue[500] }} aria-label="recipe">
-                O
+                {userName[0].toUpperCase()}
                 </Avatar>
             </Link>
           }
