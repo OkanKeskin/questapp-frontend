@@ -18,7 +18,6 @@ function Home() {
                     setPostList(result)
                 },
                 (error) => {
-                    console.log(error)
                     setIsLoaded(true);
                     setError(error);
                 }
@@ -27,7 +26,7 @@ function Home() {
 
     useEffect(() => {
         refreshPost();
-    }, [postList]);
+    }, []);
 
     if (error) {
         return <div> Error !!!</div>;
@@ -43,6 +42,7 @@ function Home() {
                             <Post
                                 className="card"
                                 userId={post.userId}
+                                postId={post.id}
                                 userName={post.userName}
                                 title={post.title}
                                 text={post.text}>

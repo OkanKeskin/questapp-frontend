@@ -11,9 +11,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import {Button, Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 
-import './Post.scss';
-
-
   const linkStyle = {
     textDecoration : "none",
     boxShadow : "none",

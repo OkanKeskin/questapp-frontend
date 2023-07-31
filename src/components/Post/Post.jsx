@@ -1,4 +1,4 @@
-import React ,{useState}from 'react'
+import React ,{useState, useEffect, useRef, useCallback}from 'react'
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -14,7 +14,8 @@ import ShareIcon from '@mui/icons-material/Share';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link } from 'react-router-dom';
 
-import './Post.scss';
+import Comment from '../Comment/Comment';
+import CommentForm from '../Comment/CommentForm';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -36,18 +37,48 @@ const ExpandMore = styled((props) => {
   
 
 function Post(props) {
+    const apiUrl = process.env.REACT_APP_API_ENDPOINT;
     const [expanded, setExpanded] = React.useState(false);
-    const {title, text, userId, userName} = props;
+    const {title, text, userId, userName, postId} = props;
     const [liked, setLiked] = useState(false);
+    const [commentList, setCommentList] = useState([]);
+    const [error, setError] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const isInitialMount  = useRef(true);
 
     const handleExpandClick = () => {
       setExpanded(!expanded);
+      refreshComments();
     };
 
     const handleLike = () => {
         setLiked(!liked);
     }
-  
+
+    const refreshComments = useCallback(() => {
+      fetch(apiUrl + "/comments?postId=" + postId)
+        .then(res => res.json())
+        .then(
+          (result) => {
+            setIsLoaded(true);
+            setCommentList(result)
+          },
+          (error) => {
+            setIsLoaded(true);
+            setError(error);
+          }
+        )
+    }, [apiUrl, postId]);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+    }
+    else {
+      refreshComments();
+    }
+  }, []);
+
     return (
       <Card sx={{ maxWidth: 700 }}>
         <CardHeader
@@ -79,15 +110,25 @@ function Post(props) {
             aria-expanded={expanded}
             aria-label="show more"
           >
-            <ExpandMoreIcon />
+            <ExpandMoreIcon
+            />
           </ExpandMore>
         </CardActions>
         <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <CardContent>
-            <Typography paragraph>
-                Method:
-            </Typography>
-          </CardContent>
+          <div>
+            {
+            error ? <div>Error: {error.message}</div> :
+            isLoaded ? 
+            commentList.map(comment => (
+              <Comment 
+              userId={1}
+              userName={"User"}
+              text={comment.text}
+              />
+            )) : <div>Loading...</div>
+            }
+          </div>
+          <CommentForm postId={postId} userId = {1} userName={"Okan"}/>
         </Collapse>
       </Card>
     );
